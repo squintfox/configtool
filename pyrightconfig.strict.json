@@ -1,0 +1,51 @@
+{
+  "typeCheckingMode": "basic",
+  "pythonVersion": "3.12",
+  "extraPaths": [
+    ".",
+    "configtool-client",
+    "configtool-secrets"
+  ],
+  "include": [
+    "configtool/__init__.py",
+    "configtool/command_policy.py",
+    "configtool/db.py",
+    "configtool/errors.py",
+    "configtool/internal.py",
+    "configtool/helpers.py",
+    "configtool/public.py",
+    "configtool-client/configtool_client/__init__.py",
+    "configtool-secrets/configtool_secrets/secrets.py",
+    "configtool-client/configtool_client/config.py",
+    "configtool-client/configtool_client/errors.py",
+    "configtool-secrets/configtool_secrets/__init__.py",
+    "configtool-secrets/configtool_secrets/constants.py",
+    "configtool-secrets/configtool_secrets/errors.py",
+    "configtool-secrets/configtool_secrets/models.py",
+    "configtool-secrets/configtool_secrets/handlers/file.py",
+    "configtool-secrets/configtool_secrets/handlers/command.py",
+    "configtool-secrets/configtool_secrets/handlers/keyvault.py",
+    "configtool-secrets/configtool_secrets/handlers/vaultwarden.py"
+  ],
+  "strict": [
+    "configtool/__init__.py",
+    "configtool/command_policy.py",
+    "configtool/db.py",
+    "configtool/errors.py",
+    "configtool/internal.py",
+    "configtool/helpers.py",
+    "configtool/public.py",
+    "configtool-client/configtool_client/__init__.py",
+    "configtool-secrets/configtool_secrets/secrets.py",
+    "configtool-client/configtool_client/config.py",
+    "configtool-client/configtool_client/errors.py",
+    "configtool-secrets/configtool_secrets/__init__.py",
+    "configtool-secrets/configtool_secrets/constants.py",
+    "configtool-secrets/configtool_secrets/errors.py",
+    "configtool-secrets/configtool_secrets/models.py",
+    "configtool-secrets/configtool_secrets/handlers/file.py",
+    "configtool-secrets/configtool_secrets/handlers/command.py",
+    "configtool-secrets/configtool_secrets/handlers/keyvault.py",
+    "configtool-secrets/configtool_secrets/handlers/vaultwarden.py"
+  ]
+}

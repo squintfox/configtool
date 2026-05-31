@@ -1,0 +1,27 @@
+demoapp:
+  environments:
+    local:
+      - demo.default
+      - demo.service
+
+  config:
+    demo:
+      default:
+        service_name:
+          value: example-service
+          env:
+            - DEMO_SERVICE_NAME
+      service:
+        api_token:
+          value: ignored-by-file-handler
+          secret_namespace: demo_secrets.api_token
+          env:
+            - DEMO_API_TOKEN
+
+    demo_secrets:
+      default: {}
+      api_token:
+        secret_type:
+          value: file
+        file-path:
+          value: examples/minimal-file-secret/secrets/api_token.txt

@@ -1,0 +1,41 @@
+{
+    "files.watcherExclude": {
+        "**/.venv/**": true,
+        "**/__pycache__/**": true,
+        "**/*.egg-info/**": true,
+         "**/.git/objects/**": true,
+        "**/.git/subtree-cache/**": true,
+    },
+    "search.exclude": {
+        "**/.venv": true,
+        "**/__pycache__": true,
+        "**/*.egg-info": true
+    },
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/*.egg-info": true
+    },
+    "python.terminal.activateEnvironment": false,
+    "python.analysis.extraPaths": [
+        "./configtool-client",
+        "./configtool-secrets"
+    ],
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+        }
+    },
+    "[powershell]": {
+        "editor.formatOnSave": true
+    },
+    "editor.rulers": [
+        92
+    ],
+    "code-runner.executorMap": {
+        "python": "& \"$pythonPath\" $fullFileName"
+    },
+    "code-runner.runInTerminal": true,
+    "code-runner.ignoreSelection": true
+}

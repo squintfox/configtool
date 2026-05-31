@@ -1,0 +1,11 @@
+{
+    "recommendations": [
+        "vscode-icons-team.vscode-icons",
+        "formulahendry.code-runner",
+        "eamodio.gitlens",
+        "ms-python.python",
+        "KevinRose.vsc-python-indent",
+        "ms-python.black-formatter",
+        "ms-python.isort"
+    ]
+}

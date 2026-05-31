@@ -1,0 +1,13 @@
+[project]
+name = "configtool-secrets"
+authors = [{ name = "Robert Spadaro", email = "robertjspadaro@gmail.com" }]
+description = "Configuration Tool Secret Manager"
+dynamic = ["version"]
+requires-python = ">=3.12.0"
+
+dependencies = [
+    'azure-identity',
+    'azure-keyvault',
+    'keyring',
+    'requests',
+]
