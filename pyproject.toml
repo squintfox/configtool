@@ -3,7 +3,7 @@ name = "configtool"
 authors = [{ name = "Robert Spadaro", email = "robertjspadaro@gmail.com" }]
 description = "Configuration Tool"
 readme = "README.md"
-version = "3.0.7"
+version = "3.0.8"
 requires-python = ">=3.12.0"
 
 dependencies = ["pyyaml>=6"]

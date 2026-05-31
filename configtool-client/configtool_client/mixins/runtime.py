@@ -139,6 +139,12 @@ class ConfigRuntimeMixin:
         """Format one value for dotenv stream parsing."""
         return str(value)
 
+    @staticmethod
+    def _sanitize_env_var_name(name: str) -> str:
+        """Sanitize environment variable name by replacing spaces with underscores."""
+        # Replace spaces with underscores to ensure valid .env syntax
+        return name.replace(' ', '_')
+
     def _iter_selected_env_refs(
         self, env_map: Mapping[str, str], libraries: list[str]
     ) -> list[tuple[str, str, str]]:
@@ -158,7 +164,9 @@ class ConfigRuntimeMixin:
         entries: list[tuple[str, str]] = []
         for env_var, library, var in self._iter_selected_env_refs(env_map, libraries):
             value = self._libraries_mut[library][var]
-            entries.append((env_var, str(value)))
+            # PATCHED: Sanitize env var names to remove spaces
+            sanitized_env_var = self._sanitize_env_var_name(env_var)
+            entries.append((sanitized_env_var, str(value)))
         return entries
 
     def _build_selected_env_entries(
@@ -218,7 +226,9 @@ class ConfigRuntimeMixin:
 
         for index, (var_name, value) in enumerate(raw_library.items()):
             if isinstance(value, str):
-                runtime_key = f'CFGT_RUNTIME_{library.upper()}_{index}'
+                # PATCHED: Sanitize library name to remove spaces
+                sanitized_library = self._sanitize_env_var_name(library.upper())
+                runtime_key = f'CFGT_RUNTIME_{sanitized_library}_{index}'
                 runtime_key_to_var[runtime_key] = var_name
                 runtime_entries.append((runtime_key, value))
             else:
