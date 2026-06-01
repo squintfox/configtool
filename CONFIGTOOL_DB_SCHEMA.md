@@ -231,6 +231,13 @@ The secret namespace referenced by `secret_namespace` is `<secret_root>.<secret_
 
 ### Supported `secret_type` Values
 
+Quick reference:
+
+- `file`: read secret material from a local file path (common for `/run/secrets/...`).
+- `vaultwarden`: read secret material from Vaultwarden items/folders.
+- `keyvault`: read secret material from Azure Key Vault.
+- `command`: run a command and use trimmed stdout as the secret value.
+
 #### `file`
 
 ```yaml
@@ -285,6 +292,7 @@ How it works:
 
 - The command's stdout is captured and stripped.
 - The application variable's own `value` field is ignored.
+- When specifying a list, only the final command's output is returned.
 
 #### `keyvault`
 

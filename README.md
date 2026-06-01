@@ -75,7 +75,7 @@ follow, like "hey we've moved to instance 2").
 
 ## Configtool Secrets
 
-Optional part of Configtool, used to connect to a vault (Azure KeyVault) and retrieve a secret.
+Optional part of Configtool, used to retrieve secret values through pluggable handlers.
 
 Unlocking requires a:
 
@@ -83,15 +83,97 @@ Unlocking requires a:
 - secret_config: a mapping between the secret name in the vault and the returned output
 (this mapping is also retrieved from Configtool)
 
-Secrets specify a type (keyvault) and an optional cred_options.  In it's default handling
-mode, the KeyVault will attempt to be unlocked by interactive credential (on Windows, your
-browser opens and asks you to SAML authenticate).  When running in a non-interactive context
-(build, application), you must supply a managed identity (either default or user) in order
-to unlock the vault.
+Supported `secret_type` handlers:
+
+- `file`: read the secret from a local file path
+- `command`: run a command and use trimmed stdout as the secret value
+- `vaultwarden`: read the secret from a Vaultwarden item
+- `keyvault`: read the secret from Azure KeyVault
+
+### File secrets
+
+Use `secret_type: file` when your secret is available as a file (for example Docker secrets
+mounted at `/run/secrets/...`).
+
+Typical secret backend block:
+
+```yaml
+homepi_secrets:
+  hpi_portainer_token:
+    secret_type:
+      value: file
+    file-path:
+      value: /run/secrets/hpi_portainer_token
+```
+
+### Command secrets
+
+Use `secret_type: command` when the secret must be produced dynamically by a command.
+
+Typical secret backend blocks:
+
+```yaml
+command_secrets:
+  exec_secret_01:
+    secret_type:
+      value: command
+    command:
+      value: sudo some-command
+
+command_secrets:
+  exec_secret_02:
+    secret_type:
+      value: command
+    command:
+      value:
+        - sudo
+        - some-command
+```
+
+`command.value` supports either a single string or a list of command arguments.
+
+Why this is useful:
+
+- You can run one or more setup commands that produce no output, then run a final command
+  that prints only the secret value consumed by Configtool.
+- Common pattern: refresh/login/unlock first, then emit the resolved secret on stdout.
+- For multi-step shell chaining in one string command, enable `CFGT_ALLOW_SHELL_COMMANDS=true`
+  (or call a wrapper script/binary from list-arg mode).
+
+### Vaultwarden secrets
+
+Use `secret_type: vaultwarden` when secrets are stored in a Vaultwarden folder/item model.
+The application variable's `value` is treated as the Vaultwarden item name.
+
+Typical secret backend block:
+
+```yaml
+homepi_secrets:
+  vault:
+    secret_type:
+      value: vaultwarden
+    vault-url:
+      value: https://vault.example.com
+    folder-name:
+      value: homepi
+```
+
+Vaultwarden runtime requires:
+
+- `CFGT_VAULTWARDEN_USERNAME`
+- `CFGT_VAULTWARDEN_PASSWORD`
+
+### KeyVault secrets
+
+`keyvault` continues to support interactive local auth and managed identity flows.
+
+In its default handling mode, KeyVault attempts interactive credential login. On Windows,
+your browser opens for SAML authentication. In non-interactive contexts (builds/services),
+use managed identity credentials via `cred_options`.
 
 When in interactive mode, your SAML token is cached so when testing locally, you do not need
-to log in each time.  This does however require you to do it twice, the first time.  Also,
-as a developer, your computer that is running the code must be able to connect to the KeyVault
+to log in each time. This does however require you to do it twice, the first time. Also,
+as a developer, your computer that is running the code must be able to connect to KeyVault
 over the network.
 
 ## Minimal Example
