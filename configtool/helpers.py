@@ -18,7 +18,7 @@ class Namespace:
             raise ValueError('Namespace local part must not be empty.')
 
     @classmethod
-    def from_string(cls, namespace: str) -> 'Namespace':
+    def from_string(cls, namespace: object) -> 'Namespace':
         """Build a namespace object from a namespace string."""
         if not isinstance(namespace, str):
             raise TypeError('Namespace must be provided as a string.')

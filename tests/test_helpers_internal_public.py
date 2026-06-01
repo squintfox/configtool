@@ -81,6 +81,9 @@ def test_namespace_rejects_invalid_values():
     with pytest.raises(ValueError):
         Namespace.from_string('.default')
 
+    with pytest.raises(ValueError):
+        Namespace(root='lib', local='')
+
 
 def test_appconfig_load_and_overlay(sample_database):
     app = AppConfig('app', sample_database)
