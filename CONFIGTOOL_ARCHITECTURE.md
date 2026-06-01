@@ -125,14 +125,20 @@ Wrapper around a command that returns the database as JSON.
 
 ### Module: `configtool.helpers`
 
-#### `namespace_is_default(namespace: str) -> bool`
+#### `Namespace`
 
-Utility that treats both `root` and `root.default` as the default namespace for a root library.
-
-#### `split_namespace(namespace: str) -> tuple[str, str]`
-
-Shared helper that splits `root.local` style namespace strings into `(root, local)` and
-normalizes implicit defaults to `default`.
+- Validated namespace value object used internally by `configtool`.
+- `Namespace.from_string(namespace: str) -> Namespace`
+  - Parses a namespace string like `root` or `root.local`.
+  - Normalizes `root` and `root.default` to the same default form.
+- `root`
+  - Root namespace name.
+- `local`
+  - Local namespace name, normalized to `default` when the namespace string omits a local part.
+- `default`
+  - Boolean property indicating whether the namespace resolves to the default block.
+- `qualified`
+  - Normalized namespace string representation.
 
 #### `should_include_library(library: str, selected_libraries: list[str]) -> bool`
 
@@ -174,14 +180,16 @@ Core namespace overlay engine.
 - `config`
   - Property exposing the flattened, currently loaded configuration.
 - `load_namespace(namespace: str, force_default=False) -> None`
-  - Splits the namespace into a root library name and a local namespace name.
+  - Accepts either a namespace string or a `Namespace` object.
+  - Normalizes the input into a validated `Namespace` object.
   - Ensures a root entry exists in `_config`.
-  - If the namespace is `default`, merges it directly.
+  - If the namespace resolves to `default`, merges it directly.
   - If the namespace is not default:
     - overlays root `default` plus the target namespace the first time that root is loaded
     - overlays only the target namespace on later loads for the same root
   - This is the method that turns ordered namespaces into a single effective library configuration.
 - `get_config_block(namespace: str, overlay_default=False) -> dict`
+  - Accepts either a namespace string or a `Namespace` object.
   - Returns one namespace block from the raw config tree.
   - If `overlay_default=True`, merges the root `default` block before the target block.
   - This is used both by `load_namespace()` and by the client when it needs raw secret namespace definitions later.

@@ -1,17 +1,48 @@
 """Shared helper functions for config namespace and env mapping behavior."""
 
-
-def namespace_is_default(namespace: str) -> bool:
-    """Return whether a namespace targets the implicit or explicit default block."""
-    spl = namespace.split('.', 1)
-    return False if len(spl) > 1 and spl[1] not in ['default'] else True
+from dataclasses import dataclass
 
 
-def split_namespace(namespace: str) -> tuple[str, str]:
-    """Split namespace string into root and local namespace parts."""
-    root = namespace.split('.', 1)[0]
-    local = namespace.split('.', 1)[1] if not namespace_is_default(namespace) else 'default'
-    return root, local
+@dataclass(frozen=True, slots=True)
+class Namespace:
+    """Validated namespace reference with root and local parts."""
+
+    root: str
+    local: str = 'default'
+
+    def __post_init__(self) -> None:
+        """Validate namespace fields after construction."""
+        if not self.root:
+            raise ValueError('Namespace root must not be empty.')
+        if not self.local:
+            raise ValueError('Namespace local part must not be empty.')
+
+    @classmethod
+    def from_string(cls, namespace: str) -> 'Namespace':
+        """Build a namespace object from a namespace string."""
+        if not isinstance(namespace, str):
+            raise TypeError('Namespace must be provided as a string.')
+        if not namespace:
+            raise ValueError('Namespace must not be empty.')
+
+        root, local = (
+            namespace.split('.', 1) if '.' in namespace else (namespace, 'default')
+        )
+        return cls(root=root, local=local)
+
+    @property
+    def default(self) -> bool:
+        """Return whether this namespace resolves to the default block."""
+        return self.local == 'default'
+
+    @property
+    def qualified(self) -> str:
+        """Return the normalized namespace string."""
+        return self.root if self.default else f'{self.root}.{self.local}'
+
+    def __str__(self) -> str:
+        """Return the normalized namespace string."""
+        return self.qualified
 
 
 def should_include_library(library: str, selected_libraries: list[str]) -> bool:

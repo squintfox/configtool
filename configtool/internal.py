@@ -1,6 +1,6 @@
 from typing import Any
 
-from .helpers import namespace_is_default, split_namespace
+from .helpers import Namespace
 
 VariableDetails = dict[str, Any]
 NamespaceBlock = dict[str, VariableDetails]
@@ -30,34 +30,48 @@ class AppConfig:
         """Return flattened config built from loaded namespaces."""
         return self._config
 
-    def load_namespace(self, namespace: str, force_default: bool = False) -> None:
+    def load_namespace(
+        self, namespace: str | Namespace, force_default: bool = False
+    ) -> None:
         """Load a namespace block into the flattened runtime config."""
-        root, _ = split_namespace(namespace)
+        namespace_obj = (
+            namespace
+            if isinstance(namespace, Namespace)
+            else Namespace.from_string(namespace)
+        )
+        root = namespace_obj.root
         self._ensure_root(root)
 
-        if not self.get_config_block(namespace):
+        config_block = self.get_config_block(namespace_obj)
+        if not config_block:
             return
 
-        if namespace_is_default(namespace):
-            self._config[root].update(self.get_config_block(namespace))
+        if namespace_obj.default:
+            self._config[root].update(config_block)
             return
 
         # Keep existing force_default behavior unchanged (compute-only, no merge).
         if force_default:
-            self.get_config_block(namespace, overlay_default=force_default)
+            self.get_config_block(namespace_obj, overlay_default=force_default)
             return
 
         overlay_default = not bool(self._config[root])
         self._config[root].update(
-            self.get_config_block(namespace, overlay_default=overlay_default)
+            self.get_config_block(namespace_obj, overlay_default=overlay_default)
         )
 
     def get_config_block(
-        self, namespace: str, overlay_default: bool = False
+        self, namespace: str | Namespace, overlay_default: bool = False
     ) -> NamespaceBlock:
         """Return config block for namespace with optional default overlay."""
         rtrn: NamespaceBlock = {}
-        root, local = split_namespace(namespace)
+        namespace_obj = (
+            namespace
+            if isinstance(namespace, Namespace)
+            else Namespace.from_string(namespace)
+        )
+        root = namespace_obj.root
+        local = namespace_obj.local
 
         if overlay_default:
             if self._config_blocks[root]['default']:

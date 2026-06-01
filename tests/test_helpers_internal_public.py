@@ -3,7 +3,7 @@ import types
 import pytest
 
 import configtool
-from configtool.helpers import namespace_is_default
+from configtool.helpers import Namespace
 from configtool.internal import AppConfig
 from configtool.public import (
     EnvMappings,
@@ -51,10 +51,35 @@ def test_package_exports_interface():
     assert hasattr(configtool, 'Interface')
 
 
-def test_namespace_is_default_variants():
-    assert namespace_is_default('lib') is True
-    assert namespace_is_default('lib.default') is True
-    assert namespace_is_default('lib.other') is False
+def test_namespace_parsing_and_properties():
+    default_namespace = Namespace.from_string('lib')
+    explicit_default_namespace = Namespace.from_string('lib.default')
+    other_namespace = Namespace.from_string('lib.other')
+
+    assert default_namespace.root == 'lib'
+    assert default_namespace.local == 'default'
+    assert default_namespace.default is True
+    assert str(default_namespace) == 'lib'
+
+    assert explicit_default_namespace.root == 'lib'
+    assert explicit_default_namespace.local == 'default'
+    assert explicit_default_namespace.default is True
+
+    assert other_namespace.root == 'lib'
+    assert other_namespace.local == 'other'
+    assert other_namespace.default is False
+    assert str(other_namespace) == 'lib.other'
+
+
+def test_namespace_rejects_invalid_values():
+    with pytest.raises(TypeError):
+        Namespace.from_string(None)  # type: ignore[arg-type]
+
+    with pytest.raises(ValueError):
+        Namespace.from_string('')
+
+    with pytest.raises(ValueError):
+        Namespace.from_string('.default')
 
 
 def test_appconfig_load_and_overlay(sample_database):
@@ -70,6 +95,13 @@ def test_appconfig_load_and_overlay(sample_database):
     app2.load_namespace('lib.env')
     assert 'a' in app2.config['lib']
     assert 'b' in app2.config['lib']
+
+
+def test_appconfig_accepts_namespace_objects(sample_database):
+    app = AppConfig('app', sample_database)
+    app.load_namespace(Namespace.from_string('lib.env'))
+
+    assert app.config['lib']['b']['value'] == 'B'
 
 
 def test_appconfig_get_config_block_overlay_default(sample_database):
